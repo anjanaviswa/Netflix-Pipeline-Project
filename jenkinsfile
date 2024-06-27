@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+                // Add your build steps here, e.g., sh 'mvn clean install'
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+                // Add your test steps here, e.g., sh 'mvn test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+                // Add your deploy steps here, e.g., sh 'scp target/*.war user@server:/path/to/deploy'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
+
+------------------
+
+node {
+    try {
+        stage('Build') {
+            echo 'Building...'
+            // Add your build steps here, e.g., sh 'mvn clean install'
+        }
+
+        stage('Test') {
+            echo 'Testing...'
+            // Add your test steps here, e.g., sh 'mvn test'
+        }
+
+        stage('Deploy') {
+            echo 'Deploying...'
+            // Add your deploy steps here, e.g., sh 'scp target/*.war user@server:/path/to/deploy'
+        }
+    } catch (Exception e) {
+        currentBuild.result = 'FAILURE'
+        echo 'Pipeline failed: ' + e.message
+    } finally {
+        if (currentBuild.result == 'FAILURE') {
+            echo 'Sending failure notification...'
+            // Add your notification steps here, e.g., mail to: 'team@example.com', subject: 'Build failed', body: '...'
+        } else {
+            echo 'Pipeline completed successfully.'
+        }
+    }
+}
